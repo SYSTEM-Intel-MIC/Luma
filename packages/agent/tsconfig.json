@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "composite": true
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../shared" },
+    { "path": "../models" },
+    { "path": "../tools" },
+    { "path": "../permissions" },
+    { "path": "../memory" },
+    { "path": "../storage" }
+  ]
+}

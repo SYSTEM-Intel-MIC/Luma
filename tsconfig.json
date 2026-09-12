@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "@luma/shared": ["packages/shared/src"],
+      "@luma/agent": ["packages/agent/src"],
+      "@luma/models": ["packages/models/src"],
+      "@luma/tools": ["packages/tools/src"],
+      "@luma/permissions": ["packages/permissions/src"],
+      "@luma/memory": ["packages/memory/src"],
+      "@luma/storage": ["packages/storage/src"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+}

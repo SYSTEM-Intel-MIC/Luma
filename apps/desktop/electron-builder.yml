@@ -1,0 +1,19 @@
+appId: com.system-intel-mic.luma
+productName: Luma
+copyright: Copyright © 2026 SYSTEM-Intel-MIC
+directories:
+  output: release
+  buildResources: public
+files:
+  - dist/**/*
+  - dist-electron/**/*
+win:
+  target:
+    - nsis
+  icon: public/icon.ico
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Luma

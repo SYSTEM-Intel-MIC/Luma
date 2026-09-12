@@ -1,0 +1,28 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist-electron",
+    "rootDir": ".",
+    "jsx": "react-jsx",
+    "composite": true,
+    "paths": {
+      "@luma/shared": ["../../packages/shared/src"],
+      "@luma/agent": ["../../packages/agent/src"],
+      "@luma/models": ["../../packages/models/src"],
+      "@luma/tools": ["../../packages/tools/src"],
+      "@luma/permissions": ["../../packages/permissions/src"],
+      "@luma/memory": ["../../packages/memory/src"],
+      "@luma/storage": ["../../packages/storage/src"]
+    }
+  },
+  "include": ["electron/src", "renderer/src"],
+  "references": [
+    { "path": "../../packages/shared" },
+    { "path": "../../packages/agent" },
+    { "path": "../../packages/models" },
+    { "path": "../../packages/tools" },
+    { "path": "../../packages/permissions" },
+    { "path": "../../packages/memory" },
+    { "path": "../../packages/storage" }
+  ]
+}
