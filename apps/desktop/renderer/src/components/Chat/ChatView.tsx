@@ -241,9 +241,9 @@ function StepItem({ step }: { step: Record<string, unknown> }): React.JSX.Elemen
     }}>
       <span style={{ color, width: '16px', textAlign: 'center' }}>{icon}</span>
       <span style={{ color: 'var(--text-primary)' }}>{step.title as string}</span>
-      {step.detail && (
+      {typeof step.detail === 'string' && step.detail && (
         <span style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>
-          {step.detail as string}
+          {step.detail}
         </span>
       )}
     </div>
