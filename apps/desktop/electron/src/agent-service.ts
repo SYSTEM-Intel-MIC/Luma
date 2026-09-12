@@ -1,5 +1,5 @@
-import type { AppConfig, Task, MemoryEntry, MemoryCategory, PermissionDecision } from '@luma/shared';
-import { PermissionScopeType, MemoryMode } from '@luma/shared';
+import type { Task, MemoryEntry, MemoryCategory } from '@luma/shared';
+import { PermissionDecision, MemoryMode } from '@luma/shared';
 import { AgentRuntime, type AgentEvent } from '@luma/agent';
 import { ModelRouter } from '@luma/models';
 import { ToolRegistry, FilesystemTool, ShellTool, WindowsTool, NetworkTool, ProcessTool, SystemTool } from '@luma/tools';
@@ -22,7 +22,6 @@ export class AgentService {
   private memoryManager: MemoryManager;
   private agentRuntime: AgentRuntime | null = null;
   private configService: ConfigService;
-  private pendingPermissions: Map<string, (decision: PermissionDecision) => void> = new Map();
 
   constructor(configService: ConfigService, dataDir: string) {
     this.configService = configService;
@@ -110,14 +109,10 @@ export class AgentService {
   }
 
   respondToPermission(requestId: string, decision: string): void {
-    const pending = this.pendingPermissions.get(requestId);
-    if (pending) {
-      const d = decision === 'granted'
-        ? PermissionDecision.GRANTED
-        : PermissionDecision.DENIED;
-      this.permissionManager.respondToPermission(requestId, d);
-      this.pendingPermissions.delete(requestId);
-    }
+    const permissionDecision = decision === PermissionDecision.GRANTED
+      ? PermissionDecision.GRANTED
+      : PermissionDecision.DENIED;
+    this.permissionManager.respondToPermission(requestId, permissionDecision);
   }
 
   async getMemories(): Promise<MemoryEntry[]> {

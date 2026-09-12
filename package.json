@@ -16,7 +16,7 @@
   "scripts": {
     "dev": "pnpm --filter @luma/desktop dev",
     "build": "pnpm -r build",
-    "build:packages": "pnpm --filter '!@luma/desktop' build",
+    "build:packages": "pnpm --filter './packages/*' -r build",
     "build:desktop": "pnpm --filter @luma/desktop build",
     "test": "vitest run",
     "test:watch": "vitest",

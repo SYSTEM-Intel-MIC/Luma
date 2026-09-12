@@ -2,13 +2,15 @@
   "name": "@luma/desktop",
   "version": "0.1.0",
   "private": true,
+  "description": "Luma desktop application — an open-source AI agent for Windows.",
+  "author": "SYSTEM-Intel-MIC",
   "type": "module",
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -p tsconfig.json && vite build && electron-builder",
+    "build": "tsc --noEmit -p tsconfig.json && pnpm run build:vite && pnpm run build:electron",
     "build:vite": "vite build",
-    "build:electron": "electron-builder --win --config electron-builder.yml",
+    "build:electron": "electron-builder --win --x64 --config electron-builder.yml",
     "preview": "vite preview",
     "electron:dev": "vite --mode electron",
     "clean": "rm -rf dist dist-electron release"
