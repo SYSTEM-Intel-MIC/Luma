@@ -4,10 +4,13 @@ executableName: Luma
 copyright: Copyright © 2026 SYSTEM-Intel-MIC
 directories:
   output: release
-  buildResources: public
 files:
   - dist/**/*
   - dist-electron/**/*
+  - "node_modules/better-sqlite3/**/*"
+asarUnpack:
+  - "node_modules/better-sqlite3/**/*"
+npmRebuild: true
 win:
   target:
     - nsis

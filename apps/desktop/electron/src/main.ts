@@ -1,4 +1,4 @@
-import { app, BrowserWindow, globalShortcut, Tray, Menu, ipcMain, nativeImage } from 'electron';
+import { app, BrowserWindow, globalShortcut, Tray, Menu, ipcMain, nativeImage, dialog } from 'electron';
 import path from 'node:path';
 import { AgentService } from './agent-service.js';
 import { WindowManager } from './window-manager.js';
@@ -31,14 +31,28 @@ async function createWindow(): Promise<void> {
   configService = new ConfigService(dataDir);
   await configService.load();
 
-  agentService = new AgentService(configService, dataDir);
-  await agentService.initialize();
+  try {
+    agentService = new AgentService(configService, dataDir);
+    await agentService.initialize();
+  } catch (err) {
+    console.error('[Main] Failed to initialize agent service:', err);
+    dialog.showErrorBox(
+      'Luma 启动失败',
+      `Agent 服务初始化失败：${err instanceof Error ? err.message : String(err)}\n\n应用将以有限模式运行。`,
+    );
+    agentService = null as unknown as AgentService;
+  }
 
   trayManager = new TrayManager(mainWindow);
   tray = trayManager.create();
 
-  ipcHandler = new IpcHandler(agentService, configService, windowManager);
-  ipcHandler.register();
+  if (agentService) {
+    ipcHandler = new IpcHandler(agentService, configService, windowManager);
+    ipcHandler.register();
+  } else {
+    ipcHandler = new IpcHandler(null as unknown as AgentService, configService, windowManager);
+    ipcHandler.register();
+  }
 
   // Global shortcut
   const hotkey = configService.getConfig().general.hotkey;
@@ -68,7 +82,17 @@ async function createWindow(): Promise<void> {
 
 // App ready
 app.whenReady().then(async () => {
-  await createWindow();
+  try {
+    await createWindow();
+  } catch (err) {
+    console.error('[Main] Failed to create window:', err);
+    dialog.showErrorBox(
+      'Luma 启动失败',
+      `应用初始化失败：${err instanceof Error ? err.message : String(err)}`,
+    );
+    app.quit();
+    return;
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

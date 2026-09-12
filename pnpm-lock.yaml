@@ -59,6 +59,9 @@ importers:
       '@luma/tools':
         specifier: workspace:*
         version: link:../../packages/tools
+      better-sqlite3:
+        specifier: ^11.9.1
+        version: 11.10.0
       react:
         specifier: ^19.1.0
         version: 19.3.0
