@@ -35,3 +35,6 @@ apps/desktop/dist/
 # Cache
 .cache/
 .turbo/
+
+# Generated Electron main/preload bundle
+apps/desktop/dist-electron/

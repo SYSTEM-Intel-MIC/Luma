@@ -19,6 +19,7 @@ let trayManager: TrayManager;
 let agentService: AgentService;
 let configService: ConfigService;
 let ipcHandler: IpcHandler;
+let isQuitting = false;
 
 const isDev = !app.isPackaged;
 const dataDir = path.join(app.getPath('userData'), 'Luma');
@@ -40,7 +41,7 @@ async function createWindow(): Promise<void> {
   ipcHandler.register();
 
   // Global shortcut
-  const hotkey = configService.get('general.hotkey') ?? 'Control+Space';
+  const hotkey = configService.getConfig().general.hotkey;
   try {
     globalShortcut.register(hotkey, () => {
       windowManager.toggle();
@@ -51,7 +52,7 @@ async function createWindow(): Promise<void> {
 
   // Handle window close -> minimize to tray
   mainWindow.on('close', (event) => {
-    if (!app.isQuitting) {
+    if (!isQuitting) {
       event.preventDefault();
       mainWindow?.hide();
     }
@@ -93,7 +94,7 @@ app.on('window-all-closed', () => {
 
 // Before quit
 app.on('before-quit', () => {
-  (app as Electron.App & { isQuitting: boolean }).isQuitting = true;
+  isQuitting = true;
   globalShortcut.unregisterAll();
   agentService?.dispose();
   configService?.save();
