@@ -1,33 +1,48 @@
 # Luma
 
-**Your AI on Windows.**
+> **Your AI on Windows.**
+>
+> Tell Luma what you want to accomplish; it plans the work, uses scoped tools to do it, and asks before actions that could be risky.
 
-Luma is an open-source Windows AI Agent that understands your goals and operates your computer to accomplish them. You tell Luma what you want to achieve, and it figures out how.
+[![Build and Release](https://github.com/SYSTEM-Intel-MIC/Luma/actions/workflows/build-and-release.yml/badge.svg)](https://github.com/SYSTEM-Intel-MIC/Luma/actions/workflows/build-and-release.yml)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](LICENSE)
 
-> **Ask Luma. Get it done.**
+Luma is a local-first, open-source Windows desktop AI agent. It combines an Electron desktop shell, a typed agent runtime, pluggable model providers, and a permission system so that natural-language requests can be turned into observable, controllable computer tasks.
 
-## Features
+**Ask Luma. Get it done.**
 
-- **AI-First Interface** — Natural language is the primary input. Tell Luma your goal, not the steps.
-- **Agent Runtime** — Full Agent Loop: understand → plan → execute → observe → verify → complete.
-- **Tool System** — File system, shell, Windows system info, network diagnostics, browser automation, and more.
-- **Permission & Risk Engine** — High-risk operations require your approval. Luma never acts without authorization on dangerous tasks.
-- **Floating UI** — Minimal, modern floating window. Ctrl+Space to summon.
-- **System Tray** — Runs in the background, always ready.
-- **Memory** — Remembers your preferences and context across sessions.
-- **Model Flexibility** — Supports OpenAI, Anthropic, Google Gemini, DeepSeek, OpenRouter, and any OpenAI-compatible endpoint.
-- **Local-First** — Configuration, history, and memory stored locally. No cloud account required.
-- **Streaming** — Real-time AI responses and tool execution status.
+> **Project status — early development.** The core runtime, permissions, tool registry, settings UI, tray integration, and Windows build pipeline are in place. Treat the app as experimental: review every permission prompt and do not rely on it for irreversible or safety-critical work.
 
-## Installation
+## Why Luma?
 
-### Prerequisites
+Instead of asking you to find the right program and click through its menus, Luma is designed around a single workflow:
 
-- Windows 10 / 11
-- Node.js >= 20
-- pnpm >= 9
+```text
+Goal → understand → plan → evaluate risk → request permission when needed
+     → execute tools → observe → verify → report
+```
 
-### From Source
+For example, you can ask Luma to search for a file, inspect system or network information, or organize a set of files. The agent runtime is deliberately separated from the platform UI so tools, models, and policies remain testable and extensible.
+
+## Highlights
+
+- **AI-first desktop experience** — summon the floating window with `Ctrl+Space`, enter a goal, and keep the app available from the system tray.
+- **Agent runtime** — task state, planning, bounded execution, observations, and cancellation/pause controls.
+- **Safety by design** — risk analysis and explicit permission handling before higher-risk operations; the renderer is isolated from Node.js APIs.
+- **Tool architecture** — filesystem, shell, Windows, network, process, and system tools are registered through a shared typed registry.
+- **Model flexibility** — OpenAI, Anthropic, Google Gemini, DeepSeek, and OpenRouter provider implementations, with an extensible provider layer.
+- **Local-first data** — configuration, task history, and memory are stored on the local machine; no Luma account or telemetry is required.
+- **Type-safe monorepo** — TypeScript workspaces for the shared contracts, agent, models, permissions, tools, memory, storage, and desktop application.
+
+## Quick start
+
+### Requirements
+
+- Windows 10 or Windows 11 for the supported desktop target
+- [Node.js](https://nodejs.org/) 20 or later
+- [pnpm](https://pnpm.io/) 9 or later
+
+### Run from source
 
 ```bash
 git clone https://github.com/SYSTEM-Intel-MIC/Luma.git
@@ -37,97 +52,97 @@ pnpm build:packages
 pnpm dev
 ```
 
-### Release
+Then press `Ctrl+Space` to show or hide Luma. In development, start the Vite dev server before launching Electron when your workflow requires it.
 
-Download `Luma Setup.exe` from the [Releases](https://github.com/SYSTEM-Intel-MIC/Luma/releases) page.
+### Build an installer
+
+On Windows, create the release artifact with:
+
+```bash
+pnpm build:packages
+pnpm build:desktop
+```
+
+The packaged installer is written beneath `apps/desktop/release/`. Tagged releases are built by GitHub Actions and published on the [Releases page](https://github.com/SYSTEM-Intel-MIC/Luma/releases).
 
 ## Configuration
 
-After launching, open Settings to configure your AI model provider:
+Open **Settings** in the desktop app to configure a model provider, API key, endpoint, and model. API keys stay in the local application configuration and must never be committed to the repository.
 
-- **Provider** — OpenAI, Anthropic, Google, DeepSeek, OpenRouter, or Custom
-- **API Key** — Your provider API key
-- **Base URL** — Custom endpoint (for OpenAI-compatible services)
-- **Model** — Select or specify a model
+Supported provider modules:
 
-API keys are stored locally and never sent to Luma servers.
+| Provider      | Module                             |
+| ------------- | ---------------------------------- |
+| OpenAI        | `@luma/models` OpenAI provider     |
+| Anthropic     | `@luma/models` Anthropic provider  |
+| Google Gemini | `@luma/models` Google provider     |
+| DeepSeek      | `@luma/models` DeepSeek provider   |
+| OpenRouter    | `@luma/models` OpenRouter provider |
+
+See the [model guide](docs/models.md) for the provider abstraction and configuration notes.
+
+## Security and permissions
+
+Luma operates on a user's computer, so safety is a core product boundary—not an optional add-on.
+
+- Tool requests are evaluated by a risk engine before execution.
+- Permission decisions are delivered through validated Electron IPC and are required for actions above the configured automatic-execution threshold.
+- The Electron renderer uses context isolation and does not enable Node integration.
+- Luma does not enable telemetry by default.
+- Never enter secrets into prompts or commit `.env`, key, or secrets files.
+
+Read [SECURITY.md](SECURITY.md) before reporting a vulnerability, and review the detailed [security documentation](docs/security.md) and [permission model](docs/permissions.md).
 
 ## Architecture
 
-```
-Luma
-├── Desktop Shell (Electron)
-├── Renderer (React + TypeScript + Vite)
-├── Main Process (Node.js + TypeScript)
-├── Agent Runtime
-│   ├── Agent Loop
-│   ├── Planner
-│   ├── Tool Router & Executor
-│   ├── Risk Engine
-│   ├── Permission Manager
-│   ├── Context Manager
-│   ├── Memory Manager
-│   └── Task Manager
-├── Model Layer (Provider Interface)
-├── Tools (File System, Shell, Windows, Network, Process, Browser, Computer Use, Document, System)
-├── Storage (SQLite)
-└── Security (Permission + Risk Engine)
+```text
+apps/desktop              Electron main process + React renderer
+packages/agent            Task lifecycle, planning, context, execution loop
+packages/models           Provider interface and provider implementations
+packages/tools            Typed tool definitions and registry
+packages/permissions      Risk evaluation and permission management
+packages/memory           Long-lived memory coordination
+packages/storage          Local database-backed stores
+packages/shared           Shared types, constants, errors, and utilities
+tests/unit                Fast unit coverage for the core packages
 ```
 
-See [docs/architecture.md](docs/architecture.md) for details.
-
-## Model Providers
-
-| Provider | Supported |
-|---|---|
-| OpenAI | Yes |
-| Anthropic | Yes |
-| Google Gemini | Yes |
-| DeepSeek | Yes |
-| OpenRouter | Yes |
-| Custom (OpenAI Compatible) | Yes |
+For design decisions and module boundaries, start with the [architecture overview](docs/architecture.md). More focused documentation is available for the [agent runtime](docs/agent.md), [tools](docs/tools.md), [memory](docs/memory.md), and [development workflow](docs/development.md).
 
 ## Development
 
 ```bash
-pnpm install
+# Build all reusable packages (does not package Electron)
 pnpm build:packages
-pnpm dev
+
+# Run unit tests
 pnpm test
-pnpm build
+
+# Check TypeScript at the repository root
+pnpm typecheck
+
+# Build only the renderer bundle
+pnpm --filter @luma/desktop build:vite
+
+# Create the desktop package
+pnpm build:desktop
 ```
 
-## Security
+The CI workflow installs from the committed lockfile, builds the packages, runs unit tests and type checks, and packages a Windows artifact. Build failures are intentionally fatal so broken releases are not published.
 
-- **Permission System** — 5-level permission system (NONE to CRITICAL)
-- **Risk Engine** — Analyzes operations before execution
-- **Shell Sandbox** — Commands analyzed for risk before execution
-- **Electron Security** — contextIsolation enabled, no nodeIntegration
-- **IPC Validation** — All IPC messages validated
-- **No telemetry by default**
-- **API keys never logged or committed**
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md), follow the [Code of Conduct](CODE_OF_CONDUCT.md), and include tests for behavior changes where practical.
 
-See [SECURITY.md](SECURITY.md) for the full security policy.
+## Roadmap
 
-## Documentation
+The project is focused on delivering a reliable and secure Windows MVP before expanding its surface area:
 
-- [Architecture](docs/architecture.md)
-- [Agent Runtime](docs/agent.md)
-- [Tools](docs/tools.md)
-- [Permissions](docs/permissions.md)
-- [Models](docs/models.md)
-- [Memory](docs/memory.md)
-- [Security](docs/security.md)
-- [Development Guide](docs/development.md)
+1. Harden the agent loop, task controls, and permission UX.
+2. Complete file-management and Windows diagnostic workflows.
+3. Add robust browser/document capabilities behind the same permission boundary.
+4. Improve accessibility, localization, and end-to-end coverage.
 
-## Contributing
+## License and attribution
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Luma is free and open-source software licensed under the [GNU General Public License v3.0](LICENSE).
 
-## License
-
-Luma is free and open-source software licensed under [GPL-3.0](LICENSE).
-
-**Developed by SYSTEM-Intel-MIC.**
-
-> **Ask Luma. Get it done.**
+Developed by **SYSTEM-Intel-MIC**.
