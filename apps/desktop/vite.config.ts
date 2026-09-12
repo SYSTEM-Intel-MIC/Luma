@@ -49,6 +49,21 @@ export default defineConfig({
             },
           },
         },
+      ]),
+      electronRenderer(),
+    ].filter(Boolean),
+    resolve: {
+      alias: {
+        "@luma/shared": path.resolve(__dirname, "../../packages/shared/src"),
+        "@luma/agent": path.resolve(__dirname, "../../packages/agent/src"),
+        "@luma/models": path.resolve(__dirname, "../../packages/models/src"),
+        "@luma/tools": path.resolve(__dirname, "../../packages/tools/src"),
+        "@luma/permissions": path.resolve(
+          __dirname,
+          "../../packages/permissions/src",
+        ),
+        "@luma/memory": path.resolve(__dirname, "../../packages/memory/src"),
+        "@luma/storage": path.resolve(__dirname, "../../packages/storage/src"),
       },
     ]),
     electronRenderer(),
