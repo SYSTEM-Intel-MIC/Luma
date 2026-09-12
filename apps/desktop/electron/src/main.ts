@@ -1,6 +1,10 @@
 import { app, BrowserWindow, globalShortcut, Tray, Menu, ipcMain, nativeImage, dialog } from 'electron';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { AgentService } from './agent-service.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import { WindowManager } from './window-manager.js';
 import { TrayManager } from './tray-manager.js';
 import { IpcHandler } from './ipc-handler.js';
