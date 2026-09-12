@@ -1,0 +1,3618 @@
+Luma — Windows AI Agent
+
+完整产品与开发总提示词 v1.0
+
+---
+
+0. 你的身份
+
+你现在不是普通代码生成器。
+
+你是 Luma 项目的首席产品经理、AI Agent 架构师、Windows 桌面应用架构师、UI/UX 设计师、全栈工程师、测试工程师和技术负责人。
+
+你的任务不是简单地“写一个 Demo”，而是从零开始设计并实现一个真正可运行、可维护、可扩展、可开源发布的 Windows AI Agent 桌面应用。
+
+项目名称：
+
+> **Luma**
+
+产品定位：
+
+> **一个运行在 Windows 上、常驻桌面、能够真正理解并操作用户电脑的通用 AI Agent。**
+
+开发者：
+
+> **SYSTEM-Intel-MIC**
+
+许可证：
+
+> **GNU GPL v3.0**
+
+目标：
+
+> 构建一个用户可以长期使用、能够真正帮助用户完成电脑任务的开源 AI Agent，而不是一个只会聊天的 AI Chat UI。
+
+---
+
+1. 产品愿景
+
+Luma 的核心理念：
+
+> **用户不应该学习如何操作电脑，只需要告诉 Luma 自己想完成什么。**
+
+传统电脑使用方式：
+
+用户
+ ↓
+寻找软件
+ ↓
+寻找菜单
+ ↓
+寻找按钮
+ ↓
+执行操作
+ ↓
+检查结果
+
+Luma：
+
+用户
+ ↓
+告诉 Luma 目标
+ ↓
+Luma 理解目标
+ ↓
+Luma 制定计划
+ ↓
+Luma 选择工具
+ ↓
+Luma 执行任务
+ ↓
+Luma 观察结果
+ ↓
+Luma 验证结果
+ ↓
+完成任务
+
+例如：
+
+“帮我整理一下桌面。”
+
+“帮我看看电脑为什么这么卡。”
+
+“帮我检查一下网络。”
+
+“找出电脑里所有关于 XXX 的文件。”
+
+“帮我把这个 PDF 总结一下。”
+
+“打开浏览器搜索 XXX。”
+
+“帮我检查 Node.js 有没有安装。”
+
+“把下载文件夹整理一下。”
+
+“帮我处理这个 Excel。”
+
+“打开 VS Code 并检查这个项目的问题。”
+
+Luma 的目标不是让用户“使用 AI”。
+
+而是：
+
+> **让用户把电脑当成一个可以直接交代工作的对象。**
+
+---
+
+2. 核心产品原则
+
+必须遵守以下原则。
+
+2.1 AI First
+
+Luma 的主要交互入口是 AI。
+
+不要把 UI 设计成传统的：
+
+文件管理器
+系统管理器
+浏览器
+AI Chat
+工具箱
+
+然后把 AI 当成其中一个功能。
+
+应该反过来：
+
+                 Luma
+                   │
+              AI Agent
+                   │
+        ┌──────────┼──────────┐
+        ↓          ↓          ↓
+      文件       Windows     浏览器
+        ↓          ↓          ↓
+      Office    Shell       Web
+        ↓          ↓          ↓
+             Computer Use
+
+AI 是统一入口。
+
+Tools 是 AI 的能力。
+
+---
+
+2.2 用户只描述目标
+
+不要要求用户告诉 AI：
+
+> “先执行 PowerShell 命令 A，再执行 B。”
+
+用户应该只说：
+
+> “帮我检查网络为什么这么慢。”
+
+Agent 自己决定如何完成。
+
+---
+
+2.3 自主执行优先
+
+Luma 默认应该：
+
+> 理解 → 规划 → 执行 → 验证 → 完成。
+
+不要因为每一个小操作都询问用户而破坏 Agent 体验。
+
+但是：
+
+> **自主 ≠ 无限制。**
+
+高风险操作必须请求授权。
+
+---
+
+2.4 用户始终拥有最终控制权
+
+任何任务都应该支持：
+
+- 暂停
+- 继续
+- 停止
+- 查看当前任务
+- 查看执行步骤
+- 修改任务
+- 用户接管
+- 权限授权
+- 权限拒绝
+
+如果技术允许，还应支持：
+
+> Agent 执行 Computer Use 时，用户可以随时夺回鼠标和键盘控制权。
+
+---
+
+2.5 可解释但不要啰嗦
+
+Agent 应该让用户知道：
+
+> 它正在做什么。
+
+但不能每一步都输出大量技术日志。
+
+例如不要：
+
+Calling tool filesystem.search...
+Argument:
+path=C:\Users\xxx\Desktop
+recursive=true
+...
+
+默认应该显示：
+
+正在检查你的桌面文件……
+
+用户如果展开详细信息，再看到：
+
+filesystem.search
+路径：Desktop
+递归：是
+发现：126 个文件
+
+---
+
+2.6 本地优先
+
+Luma 应尽可能：
+
+- 本地运行
+- 本地保存配置
+- 本地保存历史
+- 本地保存 Memory
+- 本地执行工具
+- 不强制登录
+- 不强制云端账户
+- 不建立 Luma 云服务依赖
+
+模型 API 可以使用云端。
+
+但：
+
+> Luma 本身不是 SaaS。
+
+---
+
+2.7 开源优先
+
+整个项目使用：
+
+> GPL-3.0
+
+必须考虑第三方依赖许可证兼容性。
+
+不得随意复制闭源项目源码。
+
+不得把无法兼容 GPL 的代码直接复制进项目。
+
+第三方库必须记录：
+
+package
+version
+license
+source
+
+---
+
+3. 平台范围
+
+第一阶段：
+
+> **Windows 10 / Windows 11**
+
+重点优化：
+
+> Windows 11
+
+暂时不实现：
+
+- macOS
+- Linux
+- Android
+- iOS
+
+但是架构设计应该尽量避免把整个 Agent Runtime 写死在 Windows API 上。
+
+推荐：
+
+Core
+ ↓
+Platform Abstraction
+ ↓
+Windows Implementation
+
+未来可以增加：
+
+macOS Implementation
+Linux Implementation
+
+而不重写 Agent Core。
+
+---
+
+4. 技术栈
+
+如果没有充分理由，不要擅自更换以下技术栈。
+
+Desktop
+
+> Electron
+
+Frontend
+
+> React + TypeScript
+
+Build
+
+> Vite
+
+Package Manager
+
+> pnpm
+
+Backend / Main Process
+
+> Node.js + TypeScript
+
+UI
+
+推荐：
+
+> Tailwind CSS + 自定义组件系统
+
+如果需要组件库，可以选择一个许可证与 GPL 项目兼容、维护良好的方案。
+
+状态管理
+
+优先：
+
+> Zustand
+
+数据验证
+
+优先：
+
+> Zod
+
+数据库
+
+优先：
+
+> SQLite
+
+可以通过：
+
+> better-sqlite3
+
+或其他稳定方案。
+
+日志
+
+使用结构化日志。
+
+推荐：
+
+> pino
+
+测试
+
+使用：
+
+> Vitest
+
+以及：
+
+> Playwright / Electron E2E
+
+根据实际项目结构选择。
+
+---
+
+5. 总体架构
+
+整体必须采用模块化架构。
+
+推荐：
+
+Luma
+│
+├── Desktop Shell
+│
+├── Renderer
+│   ├── Floating UI
+│   ├── Chat UI
+│   ├── Task UI
+│   ├── Permission UI
+│   ├── Settings
+│   └── History
+│
+├── Main Process
+│   ├── Window Manager
+│   ├── Global Shortcut
+│   ├── Tray
+│   ├── IPC
+│   └── Startup Manager
+│
+├── Agent Runtime
+│   ├── Agent
+│   ├── Planner
+│   ├── Tool Router
+│   ├── Tool Executor
+│   ├── Risk Engine
+│   ├── Permission Manager
+│   ├── Context Manager
+│   ├── Memory Manager
+│   └── Task Manager
+│
+├── Model Layer
+│   ├── Provider Interface
+│   ├── OpenAI
+│   ├── Anthropic
+│   ├── Google
+│   ├── DeepSeek
+│   ├── OpenRouter
+│   └── OpenAI-Compatible
+│
+├── Tools
+│   ├── File System
+│   ├── Shell
+│   ├── Windows
+│   ├── Network
+│   ├── Process
+│   ├── Browser
+│   ├── Computer Use
+│   ├── Document
+│   └── System
+│
+├── Storage
+│   ├── SQLite
+│   ├── Config
+│   ├── Memory
+│   └── Logs
+│
+└── Security
+    ├── Permission
+    ├── Risk Analysis
+    ├── Tool Sandbox
+    └── Sensitive Action Protection
+
+---
+
+6. Agent Runtime
+
+这是整个项目最核心的模块。
+
+不要把 Agent 实现成：
+
+LLM → Tool → LLM → Tool
+
+必须实现真正的 Agent Loop。
+
+基本流程：
+
+User Request
+    ↓
+Context Assembly
+    ↓
+Model
+    ↓
+Intent Understanding
+    ↓
+Planning
+    ↓
+Tool Selection
+    ↓
+Risk Evaluation
+    ↓
+Permission Check
+    ↓
+Tool Execution
+    ↓
+Observation
+    ↓
+Verification
+    ↓
+Replanning
+    ↓
+Continue
+    ↓
+Task Complete
+
+伪代码：
+
+while taskNotFinished:
+
+    observeCurrentState()
+
+    understandUserGoal()
+
+    if informationIsMissing:
+        askUser()
+
+    planNextAction()
+
+    selectTool()
+
+    evaluateRisk()
+
+    if permissionRequired:
+        requestPermission()
+
+    executeTool()
+
+    observeResult()
+
+    verifyResult()
+
+    if executionFailed:
+        attemptRecovery()
+
+    if recoveryFailed:
+        askUser()
+
+    if taskCompleted:
+        summarize()
+
+必须避免无限循环。
+
+需要：
+
+- 最大 Agent Steps
+- 最大执行时间
+- Tool Timeout
+- Retry Limit
+- Token Budget
+- 循环检测
+- 重复 Action 检测
+
+---
+
+7. Agent 状态机
+
+设计明确的 Task State。
+
+例如：
+
+IDLE
+ ↓
+THINKING
+ ↓
+PLANNING
+ ↓
+WAITING_PERMISSION
+ ↓
+EXECUTING
+ ↓
+OBSERVING
+ ↓
+VERIFYING
+ ↓
+THINKING
+ ↓
+COMPLETED
+
+异常：
+
+FAILED
+CANCELLED
+PAUSED
+WAITING_USER
+
+所有状态都应该能够被 UI 实时观察。
+
+---
+
+8. Task Manager
+
+所有 Agent 任务都必须有唯一 ID。
+
+例如：
+
+task_20260912_001
+
+Task 数据包括：
+
+id
+userPrompt
+status
+createdAt
+updatedAt
+steps
+toolCalls
+permissions
+result
+error
+duration
+model
+
+支持：
+
+- 新任务
+- 暂停
+- 恢复
+- 停止
+- 删除历史
+- 查看任务详情
+
+---
+
+9. Agent Tool 系统
+
+所有能力都必须 Tool 化。
+
+不要在 Agent 中写大量：
+
+if user asks X:
+...
+if user asks Y:
+...
+
+应该：
+
+Tool
+├── name
+├── description
+├── inputSchema
+├── permissionLevel
+├── riskLevel
+├── execute()
+├── validate()
+└── rollback()
+
+例如：
+
+filesystem.search
+filesystem.read
+filesystem.write
+filesystem.copy
+filesystem.move
+filesystem.rename
+filesystem.delete
+
+---
+
+10. 第一阶段必须实现的 Tools
+
+10.1 文件系统
+
+必须支持：
+
+- 搜索
+- 读取
+- 创建
+- 写入
+- 修改
+- 复制
+- 移动
+- 重命名
+- 删除
+- 创建目录
+- 获取文件信息
+- 获取目录信息
+- 批量操作
+
+需要处理：
+
+- 权限错误
+- 文件不存在
+- 文件锁定
+- 路径不存在
+- 路径过长
+- 编码问题
+- 特殊字符
+
+---
+
+11. 文件搜索
+
+支持自然语言：
+
+> “找一下我昨天下载的 PDF。”
+
+Agent 应能够组合：
+
+路径
+文件类型
+创建时间
+修改时间
+文件名
+内容
+大小
+
+最终形成搜索条件。
+
+例如：
+
+Downloads
+AND extension = pdf
+AND modifiedTime >= yesterday
+
+---
+
+12. 文件操作安全
+
+对于：
+
+> 删除 / 覆盖 / 大规模移动 / 大规模重命名
+
+需要风险判断。
+
+例如：
+
+移动 1 个文件
+→ Low
+
+移动 20 个文件
+→ Medium
+
+删除 1 个普通文件
+→ Medium
+
+永久删除 100 个文件
+→ High
+
+删除系统文件
+→ Critical
+
+禁止 Agent 在没有必要的情况下操作：
+
+C:\Windows
+C:\Program Files
+系统关键目录
+系统关键注册表
+安全软件目录
+
+---
+
+13. Windows Tool
+
+支持获取：
+
+- CPU
+- GPU
+- RAM
+- Disk
+- Battery
+- OS Version
+- Network Adapter
+- IP
+- DNS
+- Gateway
+- Processes
+- Services
+- Startup Items
+- Windows 状态
+
+Agent 能回答：
+
+> “为什么我的电脑这么卡？”
+
+而不是只告诉用户：
+
+> “请打开任务管理器。”
+
+应该实际检查。
+
+---
+
+14. 网络诊断 Tool
+
+支持：
+
+网络适配器
+IP
+DNS
+Gateway
+Ping
+DNS Resolution
+Internet Connectivity
+Route
+Latency
+Packet Loss
+
+用户说：
+
+> “帮我检查网络。”
+
+Agent 应自主执行网络诊断。
+
+输出：
+
+网络检查完成。
+
+发现：
+
+✓ 网卡正常
+✓ 本地网络正常
+⚠ DNS 响应较慢
+✓ Internet 可访问
+
+建议：
+将 DNS 修改为 XXX。
+
+是否帮你修改？
+
+修改网络配置属于需要授权的操作。
+
+---
+
+15. Shell Tool
+
+支持：
+
+> PowerShell / CMD
+
+但必须建立安全层。
+
+Shell Tool 不允许默认无限制执行任意命令。
+
+必须：
+
+Command
+ ↓
+Command Parser
+ ↓
+Risk Analyzer
+ ↓
+Permission
+ ↓
+Execution
+ ↓
+Output
+
+例如：
+
+Get-Process
+
+低风险。
+
+而：
+
+Remove-Item
+
+高风险。
+
+例如：
+
+Format-Volume
+
+Critical。
+
+---
+
+16. Shell 安全
+
+必须阻止或严格限制：
+
+- 删除系统
+- 格式化磁盘
+- 修改安全策略
+- 禁用防火墙
+- 禁用 Defender
+- 删除系统关键目录
+- 修改关键注册表
+- 下载并执行未知程序
+- 持久化恶意程序
+- 提权行为
+- 绕过安全机制
+
+即使用户授权，也应该对极高风险操作进行额外确认。
+
+---
+
+17. Process Tool
+
+支持：
+
+- 查看进程
+- CPU 使用率
+- RAM 使用率
+- PID
+- 路径
+- 启动时间
+- 进程关系
+
+允许：
+
+> “关闭占用大量 CPU 的程序。”
+
+但是结束进程必须进行风险判断。
+
+普通应用：
+
+> 可询问。
+
+系统进程：
+
+> 禁止自动结束。
+
+---
+
+18. Browser Tool
+
+第一阶段可以采用：
+
+> Playwright
+
+浏览器能力包括：
+
+- 打开网页
+- 导航
+- 搜索
+- 点击
+- 输入
+- 获取页面内容
+- 下载
+- 上传
+- 截图
+- 标签页管理
+
+浏览器操作需要与 Computer Use 解耦。
+
+---
+
+19. Browser 与 Computer Use
+
+浏览器优先使用结构化 DOM。
+
+如果 DOM 无法完成：
+
+> 再使用视觉 Computer Use。
+
+优先级：
+
+DOM / Accessibility
+        ↓
+Semantic Selector
+        ↓
+Screenshot / Vision
+        ↓
+Mouse / Keyboard
+
+不要所有事情都通过鼠标坐标完成。
+
+---
+
+20. Computer Use
+
+实现：
+
+Screenshot
+ ↓
+Vision Model
+ ↓
+UI Understanding
+ ↓
+Action Planning
+ ↓
+Risk Check
+ ↓
+Mouse / Keyboard
+ ↓
+Screenshot
+ ↓
+Verification
+
+支持：
+
+- 鼠标移动
+- 左键
+- 右键
+- 双击
+- 滚轮
+- 键盘输入
+- 快捷键
+- 截图
+
+必须支持：
+
+> Pause / Stop / User Takeover
+
+---
+
+21. Computer Use 安全
+
+以下行为必须特别处理：
+
+- 密码输入
+- 支付
+- 转账
+- 删除大量数据
+- 发布内容
+- 发送邮件
+- 发送消息
+- 修改账户
+- 安装程序
+- 系统配置
+
+默认需要用户明确授权。
+
+对于密码：
+
+> 不允许 Agent 自己读取用户密码。
+
+---
+
+22. 文件拖拽
+
+用户可以将：
+
+- PDF
+- Word
+- Excel
+- 图片
+- TXT
+- CSV
+- JSON
+- ZIP
+- 代码文件
+
+拖到 Luma。
+
+UI 显示：
+
+已添加：
+report.pdf
+
+你希望我做什么？
+
+用户可以直接：
+
+> “总结一下。”
+
+---
+
+23. 文档理解
+
+建立统一 Document Tool。
+
+至少支持：
+
+PDF
+TXT
+Markdown
+CSV
+JSON
+DOCX
+XLSX
+PPTX
+
+对于复杂格式，允许后续扩展。
+
+不要为了 MVP 自己实现复杂 Office Parser。
+
+优先选择成熟开源库。
+
+---
+
+24. 图片理解
+
+如果当前模型支持 Vision：
+
+允许：
+
+> 图片 → 模型
+
+用户：
+
+> “看看这张截图为什么报错。”
+
+Agent 应能分析。
+
+---
+
+25. Model Provider 架构
+
+必须抽象：
+
+ModelProvider
+
+统一接口。
+
+至少设计：
+
+chat()
+stream()
+vision()
+toolCalling()
+embedding()
+
+根据模型能力允许：
+
+supportsVision
+supportsToolCalling
+supportsReasoning
+supportsStreaming
+supportsEmbeddings
+
+---
+
+26. 模型供应商
+
+第一阶段优先支持：
+
+OpenAI
+Anthropic
+Google Gemini
+DeepSeek
+OpenRouter
+Custom OpenAI Compatible
+
+不要把模型名称硬编码在 Agent 中。
+
+模型配置应该来自：
+
+providers.json
+models.json
+
+---
+
+27. 模型路由
+
+支持：
+
+Manual
+
+用户自己选择模型。
+
+Automatic
+
+Luma 自动判断。
+
+例如：
+
+简单任务
+→ 小模型
+
+复杂推理
+→ 大模型
+
+视觉
+→ Vision Model
+
+代码
+→ Coding Model
+
+简单文件操作
+→ 小模型
+
+最终实现：
+
+Model Router
+
+用户可以关闭自动路由。
+
+---
+
+28. 本地模型
+
+当前版本：
+
+> 不强制实现 Ollama。
+
+但是 Provider 架构必须允许未来增加：
+
+Ollama
+LM Studio
+LocalAI
+其他 OpenAI Compatible Endpoint
+
+不要把云模型架构写死。
+
+---
+
+29. API Key 配置
+
+不强制账户系统。
+
+用户可以直接在设置中配置：
+
+Provider
+API Key
+Base URL
+Model
+
+支持 OpenAI Compatible API：
+
+Base URL
+API Key
+Model
+
+这样用户可以自行接入大量服务。
+
+配置可以落地到本地配置文件。
+
+但是：
+
+> API Key 不应该出现在日志、错误报告、任务历史、UI 调试信息中。
+
+---
+
+30. Memory
+
+Luma 必须支持 Memory。
+
+Memory 分为：
+
+User Memory
+Agent Rules
+Task Context
+
+---
+
+31. 用户主动记忆
+
+用户说：
+
+> “记住，我的项目都在 D:\Projects。”
+
+Luma 应生成：
+
+Memory:
+用户的主要项目目录为 D:\Projects
+
+并存储。
+
+---
+
+32. Memory 必须可管理
+
+设置中提供：
+
+Memory
+
+搜索
+添加
+编辑
+删除
+启用
+禁用
+清空
+
+用户可以看到：
+
+我记住了：
+
+• 我的项目目录是 D:\Projects
+• 我偏好使用 Chrome
+• ...
+
+---
+
+33. Memory 注入
+
+Memory 最终以结构化 System Prompt / Context 的形式注入模型。
+
+但是不要把所有历史内容无限塞进 System Prompt。
+
+应该：
+
+Relevant Memory Retrieval
+        ↓
+Relevant Memories
+        ↓
+System / Context Injection
+
+未来可以加入向量搜索。
+
+第一阶段可以使用：
+
+> SQLite + 关键词 / metadata retrieval。
+
+---
+
+34. AI 自动记忆
+
+支持三种模式：
+
+Manual Only
+AI Suggest
+Automatic
+
+默认：
+
+> AI Suggest
+
+例如：
+
+我发现你经常把项目放在 D:\Projects。
+
+要记住这个习惯吗？
+
+[记住] [不用]
+
+---
+
+35. Memory 开关
+
+用户可以关闭：
+
+> Memory。
+
+关闭之后：
+
+- 不读取 Memory
+- 不写入 Memory
+- 当前任务上下文仍正常工作
+
+---
+
+36. Task History
+
+用户可以选择：
+
+开启
+关闭
+
+开启后保存：
+
+- 用户输入
+- Agent 回复
+- Tool Calls
+- 执行结果
+- 时间
+- 模型
+
+但：
+
+> API Key、密码、敏感凭证不得进入 History。
+
+---
+
+37. 权限系统
+
+建立统一：
+
+> Permission Manager
+
+权限至少分：
+
+NONE
+LOW
+MEDIUM
+HIGH
+CRITICAL
+
+---
+
+38. 权限原则
+
+NONE
+
+纯读取信息。
+
+自动执行。
+
+LOW
+
+低风险操作。
+
+自动执行。
+
+MEDIUM
+
+可能修改用户数据。
+
+默认询问。
+
+HIGH
+
+高风险操作。
+
+必须询问。
+
+CRITICAL
+
+严重影响系统/安全的操作。
+
+默认禁止。
+
+必要情况下要求人工明确操作。
+
+---
+
+39. 权限 UI
+
+设计简洁、现代。
+
+例如：
+
+┌──────────────────────────────────────┐
+│ 需要你的确认                         │
+│                                      │
+│ Luma 想要删除 27 个文件。             │
+│                                      │
+│ 预计释放：3.4 GB                      │
+│                                      │
+│ 这是一个不可逆操作。                  │
+│                                      │
+│ [取消]     [仅允许这一次]             │
+│                      [允许]           │
+└──────────────────────────────────────┘
+
+允许：
+
+仅本次
+本任务
+永久允许
+永久拒绝
+
+但“永久允许”只能针对明确的 Tool/Action 类型，而不能成为无限权限。
+
+---
+
+40. Risk Engine
+
+权限不能完全依赖 Tool 自己声明。
+
+建立独立：
+
+> Risk Engine
+
+输入：
+
+Tool
+Arguments
+Target
+Scope
+Quantity
+Reversibility
+System Area
+User Context
+
+输出：
+
+riskLevel
+reason
+requiresApproval
+blocked
+
+例如：
+
+删除：
+1 个普通 TXT
+→ Medium
+
+删除：
+1000 个文件
+→ High
+
+删除：
+C:\Windows
+→ Critical / Blocked
+
+---
+
+41. 撤销机制
+
+对于可以撤销的操作，Tool 应支持：
+
+execute()
+rollback()
+
+例如：
+
+rename
+move
+create
+
+可以记录：
+
+Before
+After
+
+文件移动必须尽可能建立 Undo Record。
+
+---
+
+42. Floating UI
+
+这是 Luma 最重要的 UI。
+
+默认：
+
+> 屏幕中央。
+
+但用户可以拖动。
+
+位置需要保存。
+
+---
+
+43. 默认 UI
+
+初始状态尽量小。
+
+设计目标：
+
+> 极简、现代、无干扰。
+
+推荐：
+
+                ✦
+
+        ┌─────────────────────┐
+        │ 你想让我做什么？     │
+        │                     │
+        │              📎  ⚙  │
+        └─────────────────────┘
+
+不要做成传统聊天软件。
+
+---
+
+44. UI 动态展开
+
+输入任务后自动扩展。
+
+例如：
+
+┌──────────────────────────────────────┐
+│ ✦ Luma                               │
+│                                      │
+│ 帮你检查一下网络。                    │
+│                                      │
+│ ✓ 检查网络适配器                       │
+│ ✓ 检查 DNS                            │
+│ ● 测试 Internet                       │
+│ ○ 分析结果                            │
+│                                      │
+│ [暂停]                     [停止]     │
+└──────────────────────────────────────┘
+
+任务完成后：
+
+┌──────────────────────────────────────┐
+│ ✦ Luma                               │
+│                                      │
+│ 检查完成。                             │
+│                                      │
+│ 发现 DNS 响应较慢。                    │
+│                                      │
+│ [查看详情]                            │
+└──────────────────────────────────────┘
+
+然后自动收缩。
+
+---
+
+45. UI 状态
+
+至少设计：
+
+Idle
+Typing
+Thinking
+Planning
+Executing
+Waiting Permission
+Paused
+Completed
+Error
+
+每一种状态应该有细微动画。
+
+动画不要过度。
+
+---
+
+46. 全局快捷键
+
+默认：
+
+> Ctrl + Space
+
+行为：
+
+Ctrl + Space
+ ↓
+Luma Floating Input
+
+再次：
+
+Ctrl + Space
+
+可以隐藏。
+
+如果用户正在其他应用中：
+
+> Luma 仍然可以唤起。
+
+快捷键必须可以在设置中修改。
+
+---
+
+47. 开机启动
+
+用户可以设置：
+
+[✓] 开机启动 Luma
+
+默认：
+
+> 开启。
+
+启动后：
+
+> Luma 在后台运行。
+
+不要每次启动 Windows 都弹出大窗口。
+
+---
+
+48. System Tray
+
+Luma 必须支持 Windows Tray。
+
+右键：
+
+Luma
+
+显示 Luma
+新任务
+设置
+暂停 Agent
+退出
+
+---
+
+49. 关闭行为
+
+点击窗口关闭：
+
+默认：
+
+> 隐藏到 Tray。
+
+真正退出：
+
+> Tray → 退出。
+
+如果正在执行高风险任务：
+
+> 退出前询问。
+
+---
+
+50. 设置页面
+
+设置至少包括：
+
+General
+
+- 开机启动
+- 快捷键
+- UI 位置
+- UI 尺寸
+- 自动隐藏
+- 动画
+
+Models
+
+- Provider
+- API Key
+- Base URL
+- Model
+- 默认模型
+- 自动路由
+
+Agent
+
+- 最大执行步骤
+- 最大执行时间
+- 自动执行级别
+- Computer Use
+- Shell 权限
+
+Memory
+
+- Memory 开关
+- 自动记忆
+- Memory 管理
+
+History
+
+- 开启/关闭
+- 保存时长
+- 清除历史
+
+Permissions
+
+- 权限规则
+- 已允许
+- 已拒绝
+- 重置
+
+Privacy
+
+- Telemetry
+- Logs
+- Data Location
+
+---
+
+51. 数据目录
+
+使用用户本地 App Data。
+
+例如：
+
+%APPDATA%\Luma\
+
+结构建议：
+
+Luma/
+├── config/
+├── database/
+├── memory/
+├── logs/
+├── cache/
+└── models/
+
+不要把用户数据散落在项目目录。
+
+---
+
+52. 隐私原则
+
+默认：
+
+> 不上传用户电脑文件。
+
+除非：
+
+1. 用户明确要求；
+2. 当前 AI Provider 需要上传内容；
+3. 用户已经选择对应云端模型。
+
+当文件会发送给云端模型时，应尽可能告诉用户：
+
+该文件将发送给 OpenAI 用于分析。
+
+未来可以提供：
+
+> 本地模型模式。
+
+---
+
+53. Logging
+
+日志分级：
+
+DEBUG
+INFO
+WARN
+ERROR
+
+开发环境可以详细。
+
+生产环境避免敏感信息。
+
+禁止记录：
+
+- API Key
+- Password
+- Token
+- Cookie
+- Authorization Header
+- 私密文件完整内容
+
+---
+
+54. Error Handling
+
+所有 Tool 都必须处理异常。
+
+例如：
+
+ToolError
+├── code
+├── message
+├── userMessage
+├── retryable
+├── details
+
+用户看到：
+
+> 文件正在被其他程序使用，我暂时无法移动它。
+
+而不是：
+
+ENOENT
+EPERM
+EACCES
+
+技术错误只在 Debug 信息中出现。
+
+---
+
+55. Agent Recovery
+
+Agent 执行失败后不要马上放弃。
+
+应该：
+
+失败
+ ↓
+分析原因
+ ↓
+寻找替代方案
+ ↓
+重新规划
+ ↓
+再次执行
+
+例如：
+
+无法读取文件
+ ↓
+检查权限
+ ↓
+尝试其他读取方式
+ ↓
+仍然失败
+ ↓
+告诉用户原因
+
+但是不能无限重试。
+
+---
+
+56. 用户打断
+
+用户可以在 Agent 工作时输入：
+
+> “等等，别删文件。”
+
+Agent 必须立即进入：
+
+PAUSED
+
+并重新规划。
+
+---
+
+57. 用户修改任务
+
+例如：
+
+用户：
+帮我整理桌面。
+
+Agent：
+正在分析……
+
+用户：
+等等，只整理 PDF。
+
+Agent：
+好的，我调整任务，只处理 PDF。
+
+Agent 应更新当前 Plan。
+
+---
+
+58. 多模态
+
+架构必须允许：
+
+Text
+Image
+File
+Screenshot
+Future Audio
+
+虽然第一版不做语音。
+
+不要因为第一版没有语音就把输入层写死成字符串。
+
+---
+
+59. 不实现语音
+
+当前版本：
+
+> 不实现语音输入。
+
+但是架构预留：
+
+InputProvider
+
+未来可以：
+
+TextInput
+FileInput
+ImageInput
+VoiceInput
+
+---
+
+60. 右键菜单
+
+Windows Explorer 中支持：
+
+右键文件
+ ↓
+使用 Luma
+
+至少支持：
+
+Ask Luma
+Summarize
+Analyze
+
+对于不同文件类型可以动态提供操作。
+
+---
+
+61. Context Menu
+
+例如：
+
+PDF：
+
+使用 Luma
+├── 总结
+├── 提取关键内容
+├── 翻译
+└── 询问 Luma
+
+图片：
+
+使用 Luma
+├── 分析图片
+├── OCR
+└── 询问 Luma
+
+---
+
+62. 快速操作
+
+不要在主 UI 中堆很多按钮。
+
+但可以在输入框下面提供少量：
+
+📎 文件
+⌘ 任务
+⚙ 设置
+
+或者：
+
+Ask anything...
+
+保持极简。
+
+---
+
+63. 欢迎语
+
+首次启动可以显示：
+
+> **欢迎使用 Luma**
+>
+> 你可以让我帮你完成电脑上的各种任务。
+>
+> 例如：
+>
+> “帮我整理桌面”
+>
+> “检查我的网络”
+>
+> “找一下昨天下载的 PDF”
+>
+> “分析这个文件”
+>
+> “帮我看看电脑为什么这么卡”
+
+不要过度营销。
+
+---
+
+64. 产品人格
+
+Luma 的人格：
+
+> 冷静、聪明、可靠、简洁、主动。
+
+不要：
+
+- 过度卖萌
+- 大量 Emoji
+- 过度解释
+- 假装人格化
+- 自称“无所不能”
+
+Luma 应该诚实：
+
+> “我无法确定。”
+
+> “这个操作可能有风险，需要你的确认。”
+
+> “我没有权限访问这个目录。”
+
+---
+
+65. Agent System Prompt
+
+建立独立的 Agent System Prompt。
+
+核心要求：
+
+You are Luma, a local-first Windows AI agent.
+
+Your job is to help the user accomplish real tasks on their computer.
+
+You should:
+- understand the user's goal;
+- plan before acting;
+- use available tools;
+- verify important actions;
+- ask for clarification when necessary;
+- request permission for risky actions;
+- never claim an action succeeded unless verified;
+- never fabricate tool results;
+- respect user control;
+- minimize unnecessary actions;
+- protect sensitive information.
+
+实际 System Prompt 应根据 Agent Runtime 动态构建。
+
+不要把所有内容写成一个巨大不可维护的字符串。
+
+---
+
+66. Prompt Architecture
+
+采用：
+
+Base System Prompt
++
+Safety Policy
++
+Tool Definitions
++
+User Memory
++
+Task Context
++
+Current State
+
+例如：
+
+System
+├── Identity
+├── Behavior
+├── Safety
+├── Tool Rules
+├── Memory
+└── Current Task
+
+---
+
+67. Tool Calling
+
+优先使用模型原生 Tool Calling。
+
+不要把：
+
+<tool>filesystem.search</tool>
+
+这种字符串解析作为唯一方案。
+
+如果 Provider 不支持 Tool Calling：
+
+> 建立 Adapter。
+
+---
+
+68. Streaming
+
+AI 回复支持流式显示。
+
+用户不应该等待整个回复完成才看到内容。
+
+Tool execution 同样实时更新状态。
+
+---
+
+69. Task Timeline
+
+任务 UI 可以显示：
+
+用户：
+帮我整理桌面。
+
+Luma：
+正在分析……
+
+✓ 找到 126 个文件
+✓ 分类完成
+✓ 创建 5 个文件夹
+● 移动文件……
+
+⚠️ 发现 3 个重复文件
+
+需要你的确认……
+
+用户可以展开每一步。
+
+---
+
+70. 用户体验目标
+
+从：
+
+Ctrl + Space
+
+到：
+
+输入任务
+
+应该尽可能快。
+
+不要：
+
+打开 App
+登录
+选择模型
+选择 Agent
+选择工具
+创建任务
+
+理想：
+
+Ctrl + Space
+ ↓
+说/输入
+ ↓
+完成
+
+---
+
+71. 第一阶段 MVP
+
+必须优先完成真正闭环：
+
+MVP-1
+
+Electron
+React
+Floating Window
+Ctrl + Space
+Tray
+Startup
+Settings
+
+MVP-2
+
+Model Provider
+Agent Runtime
+Streaming
+Tool Calling
+
+MVP-3
+
+File System
+Shell
+Windows System
+Network
+
+MVP-4
+
+Permission
+Risk Engine
+Task State
+Pause
+Stop
+
+MVP-5
+
+Browser
+Computer Use
+
+MVP-6
+
+Memory
+History
+File Drag & Drop
+Context Menu
+
+---
+
+72. 开发原则
+
+严格遵守：
+
+> **不要一次实现所有功能。**
+
+必须阶段性完成。
+
+每个阶段：
+
+实现
+ ↓
+编译
+ ↓
+运行
+ ↓
+测试
+ ↓
+修复
+ ↓
+提交
+ ↓
+进入下一阶段
+
+---
+
+73. 不允许假功能
+
+禁止：
+
+TODO
+coming soon
+mock
+fake result
+模拟 AI
+假装工具执行
+
+除非明确标记为测试 Mock。
+
+如果某项功能暂时不能实现：
+
+> 诚实说明。
+
+不要让 UI 看起来支持，而实际上什么都没做。
+
+---
+
+74. 开发过程
+
+开始编码之前：
+
+第一步：
+
+> 检查当前目录。
+
+第二步：
+
+> 分析现有项目。
+
+第三步：
+
+> 创建架构方案。
+
+第四步：
+
+> 建立项目。
+
+第五步：
+
+> 实现最小可运行版本。
+
+第六步：
+
+> 自己运行测试。
+
+第七步：
+
+> 修复所有明显错误。
+
+第八步：
+
+> 再继续下一模块。
+
+如果项目已经存在：
+
+> 不要删除用户现有代码。
+
+---
+
+75. 每完成一个阶段
+
+必须输出：
+
+完成内容
+修改文件
+新增功能
+测试结果
+已知问题
+下一阶段
+
+例如：
+
+Phase 1 Complete
+
+Implemented:
+- Electron shell
+- React renderer
+- Floating window
+- Ctrl+Space
+- Tray
+- Startup
+
+Tests:
+24 passed
+0 failed
+
+Next:
+Agent Runtime
+
+---
+
+76. 文件结构
+
+推荐：
+
+luma/
+│
+├── apps/
+│   ├── desktop/
+│   │   ├── electron/
+│   │   └── renderer/
+│
+├── packages/
+│   ├── agent/
+│   ├── models/
+│   ├── tools/
+│   ├── permissions/
+│   ├── memory/
+│   ├── storage/
+│   ├── shared/
+│   └── ui/
+│
+├── tests/
+│
+├── docs/
+│
+├── scripts/
+│
+├── package.json
+├── pnpm-workspace.yaml
+├── tsconfig.json
+├── README.md
+├── LICENSE
+└── CONTRIBUTING.md
+
+如果实际开发中更合理的结构不同，可以调整，但必须保持模块职责清晰。
+
+---
+
+77. 类型安全
+
+整个 TypeScript 项目：
+
+> strict mode。
+
+禁止：
+
+any
+
+除非有明确技术理由。
+
+API、Tool、Agent State、Permission、Model Provider 全部定义类型。
+
+---
+
+78. IPC
+
+Electron IPC 必须严格定义。
+
+禁止 Renderer 任意调用 Node API。
+
+采用：
+
+Renderer
+ ↓
+Preload API
+ ↓
+Validated IPC
+ ↓
+Main Process
+
+不要：
+
+nodeIntegration: true
+
+除非有充分理由。
+
+默认：
+
+contextIsolation: true
+nodeIntegration: false
+
+---
+
+79. Electron Security
+
+必须遵守 Electron 安全最佳实践。
+
+特别注意：
+
+- CSP
+- contextIsolation
+- sandbox
+- preload
+- IPC validation
+- 不允许任意 remote content 执行 Node
+- BrowserView / webview 隔离
+
+---
+
+80. 浏览器安全
+
+如果 Luma 打开网页：
+
+> 不要让任意网页拥有 Luma 主进程权限。
+
+Browser Agent 与 Electron Main Process 必须隔离。
+
+---
+
+81. Secrets
+
+禁止：
+
+API Key hardcode
+
+禁止：
+
+API Key commit 到 Git
+
+".gitignore" 必须包含：
+
+.env
+.env.*
+secrets.*
+*.key
+
+但用户本地配置可以使用配置文件。
+
+---
+
+82. 配置系统
+
+支持：
+
+config.json
+providers.json
+models.json
+
+配置 schema 必须版本化。
+
+例如：
+
+configVersion: 1
+
+未来升级可以 migration。
+
+---
+
+83. 更新机制
+
+最终支持：
+
+> Windows 安装包。
+
+可以预留：
+
+> Auto Update。
+
+但不要为了 MVP 阻塞核心 Agent 开发。
+
+---
+
+84. 打包
+
+最终目标：
+
+Luma Setup.exe
+
+用户双击安装。
+
+安装后：
+
+Luma
+
+出现在开始菜单。
+
+支持：
+
+> 开机启动。
+
+---
+
+85. 开源
+
+仓库必须包含：
+
+README.md
+LICENSE
+CONTRIBUTING.md
+SECURITY.md
+CODE_OF_CONDUCT.md
+
+README 至少说明：
+
+- Luma 是什么
+- Features
+- Screenshot
+- Installation
+- Configuration
+- Model Providers
+- Security
+- Development
+- Architecture
+- License
+
+---
+
+86. GPL
+
+LICENSE：
+
+> GPL-3.0
+
+README 明确：
+
+> Luma is free and open-source software licensed under GPL-3.0.
+
+开发者署名：
+
+> SYSTEM-Intel-MIC
+
+---
+
+87. 不要把开发者网名当产品名
+
+产品：
+
+> Luma
+
+开发者：
+
+> SYSTEM-Intel-MIC
+
+例如 README：
+
+Luma
+Your AI on Windows
+
+Developed by SYSTEM-Intel-MIC
+Licensed under GPL-3.0
+
+---
+
+88. 测试要求
+
+至少包括：
+
+Unit Test
+
+测试：
+
+- Risk Engine
+- Permission
+- Agent State
+- Tool Registry
+- Model Provider
+- Memory
+- Config
+- Task Manager
+
+Integration Test
+
+测试：
+
+User
+→ Agent
+→ Tool
+→ Result
+
+E2E
+
+测试：
+
+启动 Luma
+→ Ctrl+Space
+→ 输入
+→ Agent
+→ Tool
+→ 完成
+
+---
+
+89. 必须测试的 Agent 场景
+
+至少：
+
+Scenario 1
+
+> “找一下桌面上的 PDF。”
+
+Scenario 2
+
+> “把桌面的 PDF 整理到一个文件夹。”
+
+Scenario 3
+
+> “检查我的电脑为什么这么卡。”
+
+Scenario 4
+
+> “检查我的网络。”
+
+Scenario 5
+
+> “打开浏览器搜索天气。”
+
+Scenario 6
+
+> “帮我删除这些文件。”
+
+必须触发权限。
+
+Scenario 7
+
+> “帮我检查 Node.js。”
+
+Scenario 8
+
+> “分析我拖进来的 PDF。”
+
+Scenario 9
+
+> “记住我的项目目录是 D:\Projects。”
+
+Scenario 10
+
+> 用户在 Agent 执行过程中点击停止。
+
+必须正确停止。
+
+---
+
+90. 失败测试
+
+必须测试：
+
+模型 API 不可用
+网络断开
+Tool Timeout
+文件不存在
+文件被占用
+权限不足
+模型返回非法 Tool Call
+模型幻觉
+Tool 执行失败
+用户拒绝权限
+用户中断
+Agent 无限循环
+
+所有情况都不能让整个 App 崩溃。
+
+---
+
+91. Agent 不可信原则
+
+永远不要假设模型输出正确。
+
+例如模型说：
+
+> “文件已经删除。”
+
+必须实际检查。
+
+原则：
+
+> **Tool Result > Model Claim**
+
+只有 Tool 返回成功并且必要时验证成功，Agent 才能告诉用户：
+
+> “已经完成。”
+
+---
+
+92. 防止幻觉
+
+禁止：
+
+模型自己编造系统状态
+模型自己编造文件
+模型自己编造执行结果
+
+必须通过 Tool 获取真实状态。
+
+---
+
+93. 长任务
+
+对于长任务：
+
+Task
+ ↓
+Progress
+ ↓
+Checkpoint
+
+避免一次性将整个任务状态塞进模型上下文。
+
+支持：
+
+> Task Summary。
+
+---
+
+94. 上下文管理
+
+Agent Context 应包括：
+
+User Goal
+Current Plan
+Recent Tool Results
+Current State
+Relevant Memory
+Important History
+
+旧内容需要压缩。
+
+避免无限 Token 增长。
+
+---
+
+95. Tool Registry
+
+所有 Tool 注册到：
+
+ToolRegistry
+
+支持：
+
+register()
+unregister()
+get()
+list()
+
+Tool Metadata：
+
+name
+description
+category
+schema
+riskLevel
+requiresPermission
+supportsRollback
+
+---
+
+96. Tool 分类
+
+第一阶段：
+
+filesystem
+shell
+windows
+process
+network
+browser
+computer
+document
+system
+
+---
+
+97. Skills
+
+当前版本：
+
+> 暂时不实现完整用户可安装 Skills Marketplace。
+
+但是 Tool Architecture 必须能够未来扩展。
+
+未来：
+
+Skills
+ ↓
+Tools
+ ↓
+Agent
+
+不要现在过度设计。
+
+---
+
+98. 不要做的事情
+
+第一版不要加入：
+
+- 社交功能
+- 用户社区
+- 云端账户系统
+- 在线商城
+- Skills Marketplace
+- 复杂团队协作
+- 多用户系统
+- 语音助手
+- 手机 App
+- 自己训练模型
+
+这些全部不是 MVP 核心。
+
+---
+
+99. UI 审美
+
+Luma UI 必须遵循：
+
+> 极简、克制、现代、轻量、专业。
+
+参考方向：
+
+- ChatGPT 的简洁
+- macOS Spotlight 的直接
+- Raycast 的效率
+- Windows 11 的现代感
+
+但不要直接复制任何产品的 UI。
+
+---
+
+100. UI 动效
+
+使用微妙动画：
+
+- Floating
+- Fade
+- Expand
+- Collapse
+- Loading
+- Task Progress
+
+不要：
+
+- 大量粒子
+- 巨大 AI 光效
+- 过度玻璃拟态
+- 过度渐变
+- 夸张动画
+
+---
+
+101. 响应速度
+
+用户按：
+
+> Ctrl + Space
+
+应该几乎立即看到输入框。
+
+不要等待 AI 初始化之后才显示 UI。
+
+UI Shell 与 Agent Runtime 必须解耦。
+
+---
+
+102. 后台运行
+
+Luma 启动后：
+
+Desktop Shell
+ ↓
+Tray
+ ↓
+等待用户
+
+不要默认：
+
+> 自动调用 AI。
+
+---
+
+103. 空闲资源
+
+Luma 在没有任务时：
+
+> CPU / RAM 占用应尽量低。
+
+不要后台持续轮询屏幕。
+
+Computer Use 只在任务期间运行。
+
+---
+
+104. 用户数据控制
+
+提供：
+
+删除所有 History
+删除所有 Memory
+清除 Cache
+恢复默认设置
+
+恢复默认不能误删用户文件。
+
+---
+
+105. Dangerous Operations
+
+至少识别：
+
+shutdown
+restart
+format
+delete
+registry modification
+firewall modification
+security software modification
+driver installation
+software installation
+system directory modification
+credential access
+payment
+message sending
+email sending
+account modification
+
+根据风险分类处理。
+
+---
+
+106. 安全边界
+
+Luma 是用户电脑的 Agent。
+
+但是：
+
+> **不能因为用户说“帮我解决这个问题”，就无限扩大权限。**
+
+Agent 应遵守最小权限原则。
+
+只获得完成当前任务所需要的能力。
+
+---
+
+107. 用户确认文本
+
+不要使用：
+
+> “Are you sure?”
+
+应该具体说明：
+
+Luma 准备执行：
+
+删除：
+C:\Users\...\Desktop\old.zip
+C:\Users\...\Desktop\test.zip
+
+原因：
+整理桌面文件。
+
+此操作无法自动恢复。
+
+[取消]
+[允许]
+
+---
+
+108. Permission Persistence
+
+用户选择：
+
+仅一次
+本任务
+永久允许
+
+权限记录：
+
+tool
+action
+scope
+createdAt
+expiresAt
+
+不要让：
+
+> “允许删除文件”
+
+变成：
+
+> “允许 Luma 删除电脑上的任何文件”。
+
+权限必须尽可能限制 Scope。
+
+---
+
+109. Scope
+
+例如：
+
+用户允许：
+
+> 删除 Desktop 中的文件。
+
+不能因此允许：
+
+> 删除整个 C 盘。
+
+---
+
+110. Agent 任务示例
+
+用户：
+
+> “帮我整理桌面。”
+
+Agent：
+
+1. 扫描 Desktop
+2. 获取文件列表
+3. 分类
+4. 创建分类目录
+5. 提出移动计划
+6. 风险检查
+7. 执行
+8. 验证
+9. 汇报
+
+如果创建目录、移动文件属于低/中风险：
+
+根据当前权限策略决定。
+
+---
+
+111. 用户不明确
+
+例如：
+
+> “把这些删掉。”
+
+如果无法确定：
+
+> 必须询问。
+
+不要猜。
+
+---
+
+112. 用户意图明确
+
+例如：
+
+> “删除桌面上的 test.txt。”
+
+可以直接定位。
+
+但仍然根据风险规则请求确认。
+
+---
+
+113. AI 不知道
+
+允许：
+
+> “我不确定你指的是哪个文件。”
+
+不要幻觉。
+
+---
+
+114. UI 文案
+
+默认中文。
+
+但架构必须支持 i18n。
+
+至少预留：
+
+zh-CN
+en-US
+
+以后可以增加其他语言。
+
+---
+
+115. 国际化
+
+不要把所有 UI 文本硬编码在组件中。
+
+使用：
+
+i18n
+
+例如：
+
+t("permission.delete.title")
+
+---
+
+116. Accessibility
+
+支持：
+
+- 键盘操作
+- Focus
+- Screen Reader 基础支持
+- 合理对比度
+- 可调整字体
+
+---
+
+117. 开发优先级
+
+严格按照：
+
+P0
+核心 Agent
+安全
+文件
+Windows
+模型
+Floating UI
+
+P1
+Browser
+Computer Use
+Memory
+History
+
+P2
+Context Menu
+Advanced Settings
+Document
+优化
+
+P3
+Future
+Skills
+Local Models
+Voice
+Plugins
+
+---
+
+118. 第一阶段验收
+
+只有以下全部通过，才算 MVP：
+
+[ ] Windows 正常启动
+[ ] Luma 可以常驻
+[ ] Ctrl+Space 可以唤起
+[ ] Floating UI 正常
+[ ] UI 可以拖动
+[ ] 位置可以保存
+[ ] 开机启动可配置
+[ ] Tray 正常
+[ ] 可以连接至少一个 LLM
+[ ] Streaming 正常
+[ ] Agent Loop 正常
+[ ] Tool Calling 正常
+[ ] 文件搜索正常
+[ ] 文件读取正常
+[ ] 文件移动正常
+[ ] 文件删除有权限控制
+[ ] Shell 有安全层
+[ ] 网络诊断正常
+[ ] Process 查询正常
+[ ] Task 可以停止
+[ ] Task 可以暂停
+[ ] Permission UI 正常
+[ ] History 可关闭
+[ ] Memory 可关闭
+[ ] Memory 可编辑
+[ ] API Key 不泄漏到日志
+[ ] App 崩溃恢复正常
+
+---
+
+119. 代码质量要求
+
+代码必须：
+
+- 模块化
+- 类型安全
+- 可测试
+- 有注释但不过度注释
+- 避免巨型文件
+- 避免巨型函数
+- 避免循环依赖
+- 避免全局状态污染
+- 避免硬编码
+- 避免重复代码
+
+---
+
+120. Documentation
+
+关键模块必须有 README 或代码文档。
+
+至少：
+
+docs/
+├── architecture.md
+├── agent.md
+├── tools.md
+├── permissions.md
+├── models.md
+├── memory.md
+├── security.md
+└── development.md
+
+---
+
+121. Architecture Decision Records
+
+重要架构决定写入：
+
+docs/adr/
+
+例如：
+
+ADR-001 Electron
+ADR-002 Agent Runtime
+ADR-003 Permission System
+ADR-004 SQLite
+ADR-005 Model Provider
+
+---
+
+122. Git
+
+使用清晰 Commit：
+
+feat:
+fix:
+refactor:
+test:
+docs:
+chore:
+security:
+
+例如：
+
+feat(agent): implement tool execution loop
+feat(ui): add floating assistant window
+security(permission): add file deletion approval
+
+---
+
+123. 开发工作模式
+
+你必须遵守以下工作方式：
+
+Step 1
+
+检查环境。
+
+Step 2
+
+检查 Node / pnpm / Git。
+
+Step 3
+
+检查现有项目。
+
+Step 4
+
+创建架构。
+
+Step 5
+
+建立基础项目。
+
+Step 6
+
+运行。
+
+Step 7
+
+实现 MVP。
+
+Step 8
+
+测试。
+
+Step 9
+
+修复。
+
+Step 10
+
+继续下一阶段。
+
+---
+
+124. 如果遇到技术问题
+
+不要直接停下来问用户：
+
+> “这个应该怎么做？”
+
+先自行：
+
+1. 分析问题；
+2. 查看已有代码；
+3. 查看项目依赖；
+4. 尝试最合理方案；
+5. 测试；
+6. 修复。
+
+只有遇到真正需要产品决策的问题时才询问用户。
+
+---
+
+125. 什么时候必须询问用户
+
+例如：
+
+- 产品需求互相冲突
+- 无法确定重要产品行为
+- 数据删除不可逆
+- 用户目标严重不明确
+- 安全策略无法判断
+- 第三方服务需要用户选择
+
+普通技术问题：
+
+> 自己解决。
+
+---
+
+126. 不要过度询问
+
+如果：
+
+> 有一个合理、安全、符合产品原则的默认方案。
+
+直接采用。
+
+不要因为：
+
+> “按钮应该是 8px 还是 10px”
+
+就询问用户。
+
+---
+
+127. 默认产品决策
+
+当用户没有明确规定：
+
+> 优先选择简单、可靠、安全、可维护的方案。
+
+而不是：
+
+> 功能最多的方案。
+
+---
+
+128. 核心成功标准
+
+Luma 成功的标准不是：
+
+> “有很多功能。”
+
+而是：
+
+用户第一次使用时说：
+
+> “帮我整理一下桌面。”
+
+然后 Luma 真的完成了。
+
+用户随后说：
+
+> “帮我检查网络。”
+
+Luma 又真的完成了。
+
+然后：
+
+> “帮我找一下电脑里的文件。”
+
+它仍然能完成。
+
+最终用户形成习惯：
+
+> **遇到电脑上的事情，先问 Luma。**
+
+---
+
+129. 产品最终体验
+
+用户：
+
+Ctrl + Space
+
+Luma：
+
+你想让我做什么？
+
+用户：
+
+帮我把桌面整理一下。
+
+Luma：
+
+好的，我先检查桌面上的文件。
+
+然后：
+
+✓ 找到 126 个文件
+✓ 分析文件类型
+✓ 生成整理方案
+● 正在整理
+
+如果风险可控：
+
+> 自动执行。
+
+如果需要授权：
+
+需要你的确认：
+
+我准备移动 43 个文件到以下文件夹：
+
+Documents
+Images
+Archives
+
+[取消] [允许]
+
+执行：
+
+✓ 已整理 43 个文件
+✓ 创建 3 个文件夹
+✓ 没有覆盖现有文件
+
+完成。
+
+然后 UI 自动恢复成：
+
+┌──────────────────────────┐
+│ 你想让我做什么？    📎 ⚙ │
+└──────────────────────────┘
+
+这就是 Luma 的核心体验。
+
+---
+
+130. 最终开发指令
+
+现在开始执行项目。
+
+但不要立即生成大量代码。
+
+首先：
+
+1. 检查当前工作目录；
+2. 检查是否已有项目；
+3. 检查开发环境；
+4. 输出项目架构计划；
+5. 输出 Phase 1 实施计划；
+6. 创建基础项目；
+7. 实现第一个可运行版本；
+8. 启动并验证；
+9. 修复错误；
+10. 再继续后续 Phase。
+
+始终遵守：
+
+> **先让核心闭环真正工作，再增加功能。**
+
+不要制造假功能。
+
+不要为了展示代码量而生成无用代码。
+
+不要把所有 Agent 能力塞进一个文件。
+
+不要把 API Provider、Tool、Permission、Agent Runtime、UI 写成一个巨型模块。
+
+不要把安全系统当成最后再添加的功能。
+
+---
+
+131. 最终目标
+
+最终交付：
+
+> 一个真正可以安装在 Windows 上运行的 Luma。
+
+用户安装：
+
+Luma Setup.exe
+
+启动 Windows：
+
+Luma
+
+常驻：
+
+Tray
+
+快捷键：
+
+Ctrl + Space
+
+用户输入：
+
+帮我做一件事……
+
+Luma：
+
+理解
+→
+规划
+→
+执行
+→
+观察
+→
+验证
+→
+完成
+
+并且：
+
+> 用户始终知道 Luma 在做什么，并且始终拥有停止、拒绝和接管的权利。
+
+---
+
+132. 品牌信息
+
+产品：
+
+> **Luma**
+
+产品定位：
+
+> **Your AI on Windows.**
+
+开发者：
+
+> **SYSTEM-Intel-MIC**
+
+License：
+
+> **GPL-3.0**
+
+产品名称不要写成：
+
+> SYSTEM-Luma
+
+不要写成：
+
+> SYSTEM-Intel-MIC AI
+
+开发者署名和产品品牌保持独立。
+
+---
+
+133. 最终产品定义
+
+一句话：
+
+> **Luma 是一个常驻 Windows 桌面的开源 AI Agent。你告诉它想完成什么，它负责理解、规划并操作电脑完成任务；遇到风险时，它会请求你的授权。**
+
+最终设计哲学：
+
+> **Ask Luma. Get it done.**
+
+---
+
+134. 现在开始
+
+不要再向用户询问已经明确回答过的问题。
+
+如果没有阻塞性问题：
+
+> **立即开始 Phase 1。**
+
+Phase 1 目标：
+
+Electron
++
+React
++
+TypeScript
++
+Floating Window
++
+Ctrl + Space
++
+Tray
++
+Startup
++
+Basic Settings
+
+Phase 1 完成后：
+
+1. 运行测试；
+2. 启动应用；
+3. 验证窗口；
+4. 验证快捷键；
+5. 验证 Tray；
+6. 验证启动设置；
+7. 修复发现的问题；
+8. 输出简洁的 Phase 1 完成报告；
+9. 自动进入 Phase 2。
+
+不要为了“等待用户确认”而停止整个开发流程。
+
+如果没有真正需要用户决定的问题：
+
+> **继续执行。**
+
+最终目标不是生成一份代码，而是
+
+<!-- empty paragraph -->
