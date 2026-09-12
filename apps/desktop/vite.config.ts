@@ -4,17 +4,18 @@ import electron from "vite-plugin-electron";
 import electronRenderer from "vite-plugin-electron-renderer";
 import path from "node:path";
 
+const desktopRoot = __dirname;
 const lumaAliases = {
-  "@luma/shared": path.resolve(__dirname, "../../packages/shared/src"),
-  "@luma/agent": path.resolve(__dirname, "../../packages/agent/src"),
-  "@luma/models": path.resolve(__dirname, "../../packages/models/src"),
-  "@luma/tools": path.resolve(__dirname, "../../packages/tools/src"),
+  "@luma/shared": path.resolve(desktopRoot, "../../packages/shared/src"),
+  "@luma/agent": path.resolve(desktopRoot, "../../packages/agent/src"),
+  "@luma/models": path.resolve(desktopRoot, "../../packages/models/src"),
+  "@luma/tools": path.resolve(desktopRoot, "../../packages/tools/src"),
   "@luma/permissions": path.resolve(
-    __dirname,
+    desktopRoot,
     "../../packages/permissions/src",
   ),
-  "@luma/memory": path.resolve(__dirname, "../../packages/memory/src"),
-  "@luma/storage": path.resolve(__dirname, "../../packages/storage/src"),
+  "@luma/memory": path.resolve(desktopRoot, "../../packages/memory/src"),
+  "@luma/storage": path.resolve(desktopRoot, "../../packages/storage/src"),
 };
 
 export default defineConfig({
@@ -24,11 +25,11 @@ export default defineConfig({
     react(),
     electron([
       {
-        entry: path.resolve(__dirname, "electron/src/main.ts"),
+        entry: path.resolve(desktopRoot, "electron/src/main.ts"),
         vite: {
           resolve: { alias: lumaAliases },
           build: {
-            outDir: path.resolve(__dirname, "dist-electron"),
+            outDir: path.resolve(desktopRoot, "dist-electron"),
             rollupOptions: {
               external: ["electron", "better-sqlite3"],
             },
@@ -36,14 +37,14 @@ export default defineConfig({
         },
       },
       {
-        entry: path.resolve(__dirname, "electron/src/preload.ts"),
+        entry: path.resolve(desktopRoot, "electron/src/preload.ts"),
         onstart(args) {
           args.reload();
         },
         vite: {
           resolve: { alias: lumaAliases },
           build: {
-            outDir: path.resolve(__dirname, "dist-electron"),
+            outDir: path.resolve(desktopRoot, "dist-electron"),
             rollupOptions: {
               external: ["electron"],
             },
