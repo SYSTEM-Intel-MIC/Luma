@@ -8,9 +8,9 @@
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit -p tsconfig.json && vite build && electron-builder",
-    "build:vite": "vite build --mode renderer",
-    "build:electron": "vite build && electron-builder --win --config electron-builder.yml",
+    "build": "tsc --noEmit -p tsconfig.json && pnpm run build:vite && pnpm run build:electron",
+    "build:vite": "vite build",
+    "build:electron": "electron-builder --win --x64 --config electron-builder.yml",
     "preview": "vite preview",
     "electron:dev": "vite --mode electron",
     "clean": "rm -rf dist dist-electron release"

@@ -5,42 +5,39 @@ import electronRenderer from "vite-plugin-electron-renderer";
 import path from "node:path";
 
 export default defineConfig(({ mode }) => {
-  const buildRendererOnly = mode === "renderer";
-
   return {
     root: "renderer",
     base: "./",
     plugins: [
       react(),
-      !buildRendererOnly &&
-        electron([
-          {
-            entry: path.resolve(__dirname, "electron/src/main.ts"),
-            vite: {
-              build: {
-                outDir: path.resolve(__dirname, "dist-electron"),
-                rollupOptions: {
-                  external: ["electron", "better-sqlite3"],
-                },
+      electron([
+        {
+          entry: path.resolve(__dirname, "electron/src/main.ts"),
+          vite: {
+            build: {
+              outDir: path.resolve(__dirname, "dist-electron"),
+              rollupOptions: {
+                external: ["electron", "better-sqlite3"],
               },
             },
           },
-          {
-            entry: path.resolve(__dirname, "electron/src/preload.ts"),
-            onstart(args) {
-              args.reload();
-            },
-            vite: {
-              build: {
-                outDir: path.resolve(__dirname, "dist-electron"),
-                rollupOptions: {
-                  external: ["electron"],
-                },
+        },
+        {
+          entry: path.resolve(__dirname, "electron/src/preload.ts"),
+          onstart(args) {
+            args.reload();
+          },
+          vite: {
+            build: {
+              outDir: path.resolve(__dirname, "dist-electron"),
+              rollupOptions: {
+                external: ["electron"],
               },
             },
           },
-        ]),
-      !buildRendererOnly && electronRenderer(),
+        },
+      ]),
+      electronRenderer(),
     ].filter(Boolean),
     resolve: {
       alias: {

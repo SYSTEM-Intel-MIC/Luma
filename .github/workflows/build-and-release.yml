@@ -79,11 +79,11 @@ jobs:
           find apps/desktop -name "*.exe" -o -name "*.msi" 2>/dev/null || true
 
       - name: Upload artifacts
-        if: hashFiles('apps/desktop/release/*.exe') != ''
         uses: actions/upload-artifact@v4
         with:
           name: luma-windows
           path: apps/desktop/release/*.exe
+          if-no-files-found: error
 
   release:
     name: Create Release
