@@ -44,7 +44,9 @@ export function ChatView({ onBack, onOpenSettings }: ChatViewProps): React.JSX.E
     }
   };
 
-  const isActive = ['thinking', 'planning', 'executing', 'observing', 'verifying'].includes(agentState);
+  const isActive = ['thinking', 'planning', 'executing', 'observing', 'verifying', 'waiting_permission'].includes(agentState);
+  const isPaused = agentState === 'paused';
+  const isTerminal = ['completed', 'failed', 'cancelled'].includes(agentState);
   const stateLabel = STATE_LABELS[agentState] ?? '';
 
   return (
@@ -60,8 +62,8 @@ export function ChatView({ onBack, onOpenSettings }: ChatViewProps): React.JSX.E
         <span style={{ color: 'var(--accent)', fontSize: '16px' }}>✦</span>
         <span style={{ fontSize: '14px', fontWeight: 500 }}>Luma</span>
         <div style={{ flex: 1 }} />
-        {isActive && (
-          <span className="animate-pulse" style={{ fontSize: '12px', color: 'var(--accent)' }}>
+        {(isActive || isPaused) && (
+          <span className="animate-pulse" style={{ fontSize: '12px', color: isPaused ? 'var(--warning)' : 'var(--accent)' }}>
             {stateLabel}
           </span>
         )}
@@ -86,6 +88,16 @@ export function ChatView({ onBack, onOpenSettings }: ChatViewProps): React.JSX.E
         flexDirection: 'column',
         gap: '12px',
       }}>
+        {messages.length === 0 && !isActive && !isPaused && (
+          <div style={{
+            textAlign: 'center', padding: '40px 0',
+            color: 'var(--text-secondary)', fontSize: '14px',
+          }}>
+            <div style={{ fontSize: '32px', marginBottom: '12px', color: 'var(--accent)' }}>✦</div>
+            <p>告诉 Luma 你想做什么</p>
+          </div>
+        )}
+
         {messages.map((msg, i) => (
           <MessageBubble key={i} role={msg.role} content={msg.content} />
         ))}
@@ -125,11 +137,69 @@ export function ChatView({ onBack, onOpenSettings }: ChatViewProps): React.JSX.E
           </div>
         )}
 
+        {/* Paused indicator */}
+        {isPaused && (
+          <div style={{
+            padding: '10px 14px',
+            background: 'var(--bg-secondary)',
+            borderRadius: 'var(--radius-sm)',
+            fontSize: '14px',
+            color: 'var(--warning)',
+          }}>
+            任务已暂停。点击「继续」恢复执行。
+          </div>
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 
       {/* Controls */}
-      {isActive && (
+      {(isActive || isPaused) && (
+        <div style={{
+          display: 'flex',
+          gap: '8px',
+          padding: '8px 16px',
+          borderTop: '1px solid var(--border)',
+        }}>
+          {isPaused ? (
+            <button
+              onClick={() => {
+                const api = (window as unknown as { lumaAPI?: { resume?: () => Promise<void> } }).lumaAPI;
+                api?.resume?.();
+                useAgentStore.getState().setAgentState('thinking');
+              }}
+              style={controlBtnStyle}
+            >
+              继续
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                const api = (window as unknown as { lumaAPI?: { pause?: () => Promise<void> } }).lumaAPI;
+                api?.pause?.();
+                useAgentStore.getState().setAgentState('paused');
+              }}
+              style={controlBtnStyle}
+            >
+              暂停
+            </button>
+          )}
+          <button
+            onClick={() => {
+              const api = (window as unknown as { lumaAPI?: { cancel?: () => Promise<void> } }).lumaAPI;
+              api?.cancel?.();
+              useAgentStore.getState().setAgentState('cancelled');
+              useAgentStore.getState().setStreaming('');
+            }}
+            style={{ ...controlBtnStyle, color: 'var(--error)' }}
+          >
+            停止
+          </button>
+        </div>
+      )}
+
+      {/* New chat button after terminal state */}
+      {isTerminal && (
         <div style={{
           display: 'flex',
           gap: '8px',
@@ -137,19 +207,12 @@ export function ChatView({ onBack, onOpenSettings }: ChatViewProps): React.JSX.E
           borderTop: '1px solid var(--border)',
         }}>
           <button
-            onClick={() => useAgentStore.getState().sendMessage('')}
-            style={controlBtnStyle}
-          >
-            暂停
-          </button>
-          <button
             onClick={() => {
-              const api = (window as unknown as { lumaAPI?: { cancel?: () => void } }).lumaAPI;
-              api?.cancel?.();
+              useAgentStore.getState().reset();
             }}
-            style={{ ...controlBtnStyle, color: 'var(--error)' }}
+            style={{ ...controlBtnStyle, flex: 1 }}
           >
-            停止
+            新对话
           </button>
         </div>
       )}
@@ -161,7 +224,8 @@ export function ChatView({ onBack, onOpenSettings }: ChatViewProps): React.JSX.E
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="继续对话..."
+            placeholder={isActive ? '正在执行中...' : '输入消息...'}
+            disabled={isActive}
             style={{
               flex: 1,
               minHeight: '40px',
@@ -175,6 +239,7 @@ export function ChatView({ onBack, onOpenSettings }: ChatViewProps): React.JSX.E
               resize: 'none',
               outline: 'none',
               fontFamily: 'inherit',
+              opacity: isActive ? 0.6 : 1,
             }}
           />
           <button
@@ -228,8 +293,8 @@ function MessageBubble({ role, content }: { role: string; content: string }): Re
 
 function StepItem({ step }: { step: Record<string, unknown> }): React.JSX.Element {
   const status = step.status as string;
-  const icon = status === 'completed' ? '✓' : status === 'failed' ? '✗' : status === 'running' ? '●' : '○';
-  const color = status === 'completed' ? 'var(--success)' : status === 'failed' ? 'var(--error)' : status === 'running' ? 'var(--accent)' : 'var(--text-secondary)';
+  const icon = status === 'completed' ? '✓' : status === 'failed' ? '✗' : status === 'running' ? '●' : status === 'skipped' ? '⊘' : '○';
+  const color = status === 'completed' ? 'var(--success)' : status === 'failed' ? 'var(--error)' : status === 'running' ? 'var(--accent)' : status === 'skipped' ? 'var(--warning)' : 'var(--text-secondary)';
 
   return (
     <div style={{

@@ -31,23 +31,27 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     set((state) => ({
       messages: [...state.messages, { role: 'user', content: message, timestamp: Date.now() }],
       agentState: 'thinking',
+      steps: [],
+      streaming: '',
     }));
 
     const api = (window as unknown as { lumaAPI?: { sendMessage?: (msg: string) => Promise<unknown> } }).lumaAPI;
     if (api?.sendMessage) {
       api.sendMessage(message).then((task) => {
-        set({ currentTask: task as Record<string, unknown> });
+        if (task) {
+          set({ currentTask: task as Record<string, unknown> });
+        }
       }).catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : String(err);
         set((state) => ({
           messages: [...state.messages, { role: 'assistant', content: `错误: ${msg}`, timestamp: Date.now() }],
           agentState: 'error',
+          streaming: '',
         }));
       });
     } else {
-      // Fallback for dev without Electron
       set((state) => ({
-        messages: [...state.messages, { role: 'assistant', content: '请先配置 AI 模型后使用。', timestamp: Date.now() }],
+        messages: [...state.messages, { role: 'assistant', content: '请先在设置中配置 AI 模型。', timestamp: Date.now() }],
         agentState: 'idle',
       }));
     }
@@ -60,7 +64,7 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     if (api?.respondToPermission) {
       api.respondToPermission(requestId, decision);
     }
-    set({ permissionRequest: null });
+    set({ permissionRequest: null, agentState: 'thinking' });
   },
 
   addMessage: (role: string, content: string) =>
